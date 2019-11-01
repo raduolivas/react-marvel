@@ -3,12 +3,10 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import Autocomplete, { AutocompleteProps } from '@material-ui/lab/Autocomplete';
-import InputBase from '@material-ui/core/InputBase';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { createStyles, fade, Theme, makeStyles } from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import * as routes from "../../constants/routes";
@@ -17,7 +15,7 @@ import { SignOutButton } from "../SignoutButton/";
 import Button from "@material-ui/core/Button";
 import { characters, getCharactersUrl } from "../../services/characters";
 import { CircularProgress, TextField } from "@material-ui/core";
-import { Redirect, useHistory } from "react-router";
+import { useHistory } from "react-router";
 
 interface CharacterType {
   name: string;
