@@ -56,8 +56,8 @@ const CharactersList = ({ characters }: Characters) => {
                   <Paper className={classes.paper}>
                     <Link to={`/character/${character.id}`} >
                       <img
-                            src={ character.thumbnail.path +'.'+ character.thumbnail.extension} 
-                            className={classes.thumb} alt=""
+                          src={ character.thumbnail.path +'.'+ character.thumbnail.extension} 
+                          className={classes.thumb} alt=""
                       />
                     </Link>
                     <span className={classes.name}>{ character.name }</span>

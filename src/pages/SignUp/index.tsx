@@ -2,12 +2,13 @@ import * as React from "react";
 import { Link, withRouter } from "react-router-dom";
 import * as routes from "../../constants/routes";
 import { SignUpForm } from "./SignUpForm";
+import { Container } from "@material-ui/core";
 
 const SignUpComponent = () => (
-  <div>
+  <Container maxWidth="sm">
     <h1>SignUp</h1>
     <SignUpForm />
-  </div>
+  </Container>
 );
 
 export const SignUpLink = () => (

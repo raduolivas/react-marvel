@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as routes from "../../constants/routes";
 import { auth, db } from "../../firebase";
+import { Grid, TextField, Button } from "@material-ui/core";
 
 interface InterfaceProps {
   email?: string;
@@ -50,12 +51,12 @@ export class SignUpForm extends React.Component<
       .doCreateUserWithEmailAndPassword(email, passwordOne)
       .then((authUser: any) => {
 
-        // Create a user in your own accessible Firebase Database too
+    
         db.doCreateUser(authUser.user.uid, username, email)
           .then(() => {
 
             this.setState(() => ({ ...SignUpForm.INITIAL_STATE }));
-            history.push(routes.CHARACTER);
+            history.push(routes.CHARACTERS);
           })
           .catch(error => {
             this.setState(SignUpForm.propKey("error", error));
@@ -77,35 +78,50 @@ export class SignUpForm extends React.Component<
 
     return (
       <form onSubmit={(event) => this.onSubmit(event)}>
-        <input
+
+        <Grid
+          container
+          direction="column"
+          justify="space-between"
+          alignItems="flex-end">
+        <TextField
           value={username}
           onChange={event => this.setStateWithEvent(event, "username")}
           type="text"
           placeholder="Full Name"
+          fullWidth
+          margin="normal"
         />
-        <input
+        <TextField
           value={email}
           onChange={event => this.setStateWithEvent(event, "email")}
           type="text"
           placeholder="Email Address"
+          fullWidth
+          margin="normal"
         />
-        <input
+        <TextField
           value={passwordOne}
           onChange={event => this.setStateWithEvent(event, "passwordOne")}
           type="password"
           placeholder="Password"
+          fullWidth
+          margin="normal"
         />
-        <input
+        <TextField
           value={passwordTwo}
           onChange={event => this.setStateWithEvent(event, "passwordTwo")}
           type="password"
           placeholder="Confirm Password"
+          fullWidth
+          margin="normal"
         />
-        <button disabled={isInvalid} type="submit">
+        <Button variant="contained" disabled={isInvalid} type="submit">
           Sign Up
-        </button>
+        </Button>
 
         {error && <p>{error.message}</p>}
+        </Grid>
       </form>
     );
   }
