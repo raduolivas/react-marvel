@@ -35,8 +35,7 @@ class AppComponent extends React.Component{
         <Navigation />
         <Container>
           <Switch>
-            {/* <Route exact={true} path={routes.SIGN_UP} component={SignUp} /> */}
-            <Route exact={true} path={routes.SIGN_UP} render={(props) => <SignUp {...props}/> } />
+            <Route exact={true} path={routes.SIGN_UP} component={SignUp} />
             <Route exact={true} path={routes.SIGN_IN} component={SignIn} />
             <Route exact={true} path={routes.CHARACTERS} component={Characters} />
             <Route exact={true} path={routes.CHARACTER} render={(match) => <Character match={match}/>} />

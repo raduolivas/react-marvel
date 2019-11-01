@@ -1,13 +1,16 @@
 import * as React from "react";
 import { Link, withRouter } from "react-router-dom";
+import createHistory from 'history/createBrowserHistory'
 import * as routes from "../../constants/routes";
 import { SignUpForm } from "./SignUpForm";
 import { Container } from "@material-ui/core";
 
-const SignUpComponent = () => (
+const history = createHistory();
+
+const SignUpComponent = (props) => (
   <Container maxWidth="sm">
     <h1>SignUp</h1>
-    <SignUpForm />
+    <SignUpForm history={history}/>
   </Container>
 );
 

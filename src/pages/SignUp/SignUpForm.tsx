@@ -51,7 +51,6 @@ export class SignUpForm extends React.Component<
       .doCreateUserWithEmailAndPassword(email, passwordOne)
       .then((authUser: any) => {
 
-    
         db.doCreateUser(authUser.user.uid, username, email)
           .then(() => {
 
