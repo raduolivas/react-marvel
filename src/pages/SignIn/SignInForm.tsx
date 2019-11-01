@@ -47,7 +47,7 @@ export class SignInForm extends React.Component<InterfaceProps, InterfaceState> 
       .doSignInWithEmailAndPassword(email, password)
       .then(() => {
         this.setState(() => ({ ...SignInForm.INITIAL_STATE }));
-        history.push(routes.HOME);
+        history.push(routes.CHARACTERS);
       })
       .catch(error => {
         this.setState(SignInForm.propKey("error", error));

@@ -55,7 +55,7 @@ export class SignUpForm extends React.Component<
           .then(() => {
 
             this.setState(() => ({ ...SignUpForm.INITIAL_STATE }));
-            history.push(routes.HOME);
+            history.push(routes.CHARACTER);
           })
           .catch(error => {
             this.setState(SignUpForm.propKey("error", error));

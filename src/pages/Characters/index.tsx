@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { withAuthorization } from "../../firebase/withAuthorization";
 import CharactersList  from "./CharactersList";
 import { characters, getCharactersUrl } from '../../services/characters';
@@ -19,7 +19,6 @@ class CharactersComponent extends React.Component {
   private loadCharacters = async() => { 
     const response = await characters.get(getCharactersUrl());
     this.setState({ characters: response.data.data.results })
-    console.log(response.data.data.results);
   }
 
   public render() {

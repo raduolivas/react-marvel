@@ -1,14 +1,13 @@
 import * as React from "react";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 
-import CssBaseline from '@material-ui/core/CssBaseline';
 import Container from '@material-ui/core/Container';
 
-import { BrowserRouter, Route, Switch } from "react-router-dom";
 import * as routes from "../constants/routes";
 import { firebase } from "../firebase";
 import { withAuthentication } from "../firebase/withAuthentication";
 import { Characters } from "../pages/Characters";
-import { Landing } from "../pages/Landing";
+import { Character } from "../pages/Character";
 import { SignIn } from "../pages/SignIn";
 import { SignUp } from "../pages/SignUp";
 import { Navigation } from "./Navigation/";
@@ -33,14 +32,14 @@ class AppComponent extends React.Component{
   public render() {
     return (
       <BrowserRouter>
-        
         <Navigation />
         <Container>
           <Switch>
-            <Route exact={true} path={routes.LANDING} component={Landing} />
             <Route exact={true} path={routes.SIGN_UP} component={SignUp} />
             <Route exact={true} path={routes.SIGN_IN} component={SignIn} />
-            <Route exact={true} path={routes.HOME} component={Characters} />
+            <Route exact={true} path={routes.CHARACTERS} component={Characters} />
+            {/* <Route exact={true} path={routes.CHARACTER} component={Character}/> */}
+            <Route exact={true} path={routes.CHARACTER} render={(match) => <Character match={match}/>} />
           </Switch>
         </Container>
       </BrowserRouter>

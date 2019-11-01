@@ -1,13 +1,13 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
+import Autocomplete, { AutocompleteProps } from '@material-ui/lab/Autocomplete';
 import InputBase from '@material-ui/core/InputBase';
 import { createStyles, fade, Theme, makeStyles } from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
@@ -15,7 +15,13 @@ import * as routes from "../../constants/routes";
 import { AuthUserContext } from "../../firebase/AuthUserContext";
 import { SignOutButton } from "../SignoutButton/";
 import Button from "@material-ui/core/Button";
+import { characters, getCharactersUrl } from "../../services/characters";
+import { CircularProgress, TextField } from "@material-ui/core";
+import { Redirect, useHistory } from "react-router";
 
+interface CharacterType {
+  name: string;
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -38,9 +44,10 @@ const useStyles = makeStyles((theme: Theme) =>
       '&:hover': {
         backgroundColor: fade(theme.palette.common.white, 0.25),
       },
-      marginRight: theme.spacing(2),
+      marginRight: theme.spacing(3),
       marginLeft: 0,
-      width: '100%',
+      width: 400,
+      text: theme.palette.common.white,
       [theme.breakpoints.up('sm')]: {
         marginLeft: theme.spacing(3),
         width: 'auto',
@@ -82,12 +89,26 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const Navigation = () => {
+
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
+  const history = useHistory();{}
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState<null | HTMLElement>(null);
+  
+  //Search
+  const [searchId, setSearchId] = useState()
+  const [open, setOpen] = useState(false);
+  const [options, setOptions] = useState<CharacterType[]>([]);
+  const loading = open && options.length === 0;
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+  const sleep = (delay = 0) =>{
+    return new Promise(resolve => {
+      setTimeout(resolve, delay);
+    });
+  }
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -106,6 +127,10 @@ export const Navigation = () => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  const reload = (id: string) => {
+   history.replace(`/character/${id}`)
+  }
+
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -116,9 +141,42 @@ export const Navigation = () => {
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       open={isMenuOpen}
       onClose={handleMenuClose}>
-        < SignOutButton />
+        <SignOutButton/>
     </Menu>
   );
+
+  useEffect(() => {
+    let active = true;
+
+    if (!loading) {
+      return undefined;
+    }
+
+    (async () => {
+      const response = await characters.get(getCharactersUrl());
+      await sleep(1e3);
+      const charactersItems = response.data.data.results;
+
+      if (active) {
+        setOptions(Object.keys(charactersItems).map((key: string) => charactersItems[key]) as CharacterType[]);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [loading]);
+
+  useEffect(() => {
+    if (!open) {
+      setOptions([]);
+    }
+  }, [open]); 
+
+  useEffect(()=> {
+    if (searchId) {
+      reload(searchId);
+    }
+  }, [searchId])
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
@@ -143,42 +201,62 @@ export const Navigation = () => {
           aria-controls="primary-search-account-menu"
           aria-haspopup="true"
           color="inherit">
-
           <AccountCircle />
         </IconButton>
         <p>Profile</p>
       </MenuItem>
     </Menu>
   );
+
   return (
     <div className={classes.grow}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
-            edge="start"
-            className={classes.menuButton}
-            color="inherit"
-            aria-label="open drawer">
-            <MenuIcon />
-          </IconButton>
           <Typography className={classes.title} variant="h6" noWrap>
            Marvel
           </Typography>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </div>
-          
-          <Button href={routes.HOME} color="inherit">Characters</Button>
+           <AuthUserContext.Consumer>
+            {(authUser: any) => (authUser ?  
+          <Autocomplete
+            className={classes.search}
+            style={{ width: 300 }}
+            open={open}
+            onOpen={() => {
+              setOpen(true);
+            }}
+            onClose={(value) => {
+              setOpen(false);
+            }}
+            onChange={(event, option) => {
+              if (option) {
+                history.push(`/character/${option.id}`);
+              }
+            }}
+            getOptionLabel={(option: any) => option.name}
+            options={options}
+            loading={loading}
+            renderInput={(params: any) => (
+              <TextField
+                {...params}
+                placeholder="Search characters"
+                fullWidth
+                variant="outlined"
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <React.Fragment>
+                      {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                      {params.InputProps.endAdornment}
+                    </React.Fragment>
+                  ),
+                }}
+              />
+            )}
+          />
+          : null )}
+          </AuthUserContext.Consumer>
+
+          <Button href={routes.CHARACTERS} color="inherit">Characters</Button>
  
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
@@ -193,7 +271,7 @@ export const Navigation = () => {
                     onClick={handleProfileMenuOpen}
                     color="inherit"
                     >  <AccountCircle />
-                </IconButton>  : null )}
+                </IconButton>  : <Button href={routes.SIGN_IN} color="inherit">Login</Button> )}
            
             </AuthUserContext.Consumer>
           </div>
@@ -213,35 +291,4 @@ export const Navigation = () => {
       {renderMenu}
     </div>
   );
- }
-
-// export const Navigation = () => (
-//     <AuthUserContext.Consumer>
-//         {(authUser: any) => (authUser ? <NavigationAuth /> : <NavigationNonAuth />)}
-//     </AuthUserContext.Consumer>
-//     );
-
-// const NavigationAuth = () => (
-//     <ul>
-//         <li>
-//             <Link to={routes.LANDING}>Landing</Link>
-//         </li>
-//         <li>
-//             <Link to={routes.HOME}>Home</Link>
-//         </li>
-//         <li>
-//             <SignOutButton />
-//         </li>
-//     </ul>
-// );
-
-// const NavigationNonAuth = () => (
-//     <ul>
-//         <li>
-//             <Link to={routes.LANDING}>Landing</Link>
-//         </li>
-//         <li>
-//             <Link to={routes.SIGN_IN}>Sign In</Link>
-//         </li>
-//     </ul>
-// );
+}
