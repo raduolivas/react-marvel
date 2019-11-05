@@ -226,6 +226,7 @@ export const Navigation = () => {
               setOpen(false);
             }}
             onChange={(event, option) => {
+              event.preventDefault();
               if (option) {
                 history.push(`/character/${option.id}`);
               }
